@@ -1,0 +1,6 @@
+{
+  "name": "CinePulse",
+  "description": "Worldwide entertainment hub for Movies, TV Series, and Anime with real-time streaming availability and ratings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
