@@ -1,13 +1,19 @@
 import React from 'react';
-import { Bookmark, Compass, Film, Home, Search, Smartphone } from 'lucide-react';
+import { Bookmark, Compass, Download, Film, Home, Search } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'HOME' | 'EXPLORE' | 'WATCHLIST';
   onTabChange: (tab: 'HOME' | 'EXPLORE' | 'WATCHLIST') => void;
   onSearchFocus?: () => void;
+  onInstallClick?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onSearchFocus }) => {
+export const Header: React.FC<HeaderProps> = ({
+  activeTab,
+  onTabChange,
+  onSearchFocus,
+  onInstallClick
+}) => {
   return (
     <header className="sticky top-0 z-30 bg-[#0A0D18]/90 backdrop-blur-md border-b border-purple-500/10 px-4 sm:px-8 py-3 flex items-center justify-between">
       {/* Brand Logo */}
@@ -21,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onSearch
         <div>
           <span className="text-lg sm:text-xl font-black text-white tracking-tight">CinePulse</span>
           <span className="hidden sm:inline-block ml-2 text-[10px] font-semibold text-purple-400 bg-purple-950/80 px-2 py-0.5 rounded-full border border-purple-500/20">
-            Worldwide Hub
+            Web App
           </span>
         </div>
       </div>
@@ -59,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onSearch
         </button>
       </nav>
 
-      {/* Quick Search Shortcut */}
+      {/* Header Actions */}
       <div className="flex items-center space-x-2">
         <button
           onClick={() => {
@@ -71,6 +77,17 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onSearch
           <Search className="w-4 h-4 text-purple-400" />
           <span className="hidden sm:inline">Search media...</span>
         </button>
+
+        {onInstallClick && (
+          <button
+            onClick={onInstallClick}
+            className="flex items-center space-x-1.5 bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-purple-900/30 transition-all active:scale-95"
+            title="Install App"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline">Install App</span>
+          </button>
+        )}
       </div>
     </header>
   );

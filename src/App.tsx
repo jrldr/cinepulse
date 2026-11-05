@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { MediaDetailModal } from './components/MediaDetailModal';
 import { MobileNavBar } from './components/MobileNavBar';
 import { PwaInstallBanner } from './components/PwaInstallBanner';
+import { PwaInstallModal } from './components/PwaInstallModal';
 import { WatchlistProvider } from './context/WatchlistContext';
 import { MediaCategory, MediaItem, MediaType } from './types/media';
 import { ExploreView } from './views/ExploreView';
@@ -15,6 +16,32 @@ export const AppContent: React.FC = () => {
   const [exploreType, setExploreType] = useState<MediaType>('ALL');
   const [exploreCategory, setExploreCategory] = useState<MediaCategory>('TRENDING');
 
+  // PWA Install state
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleNativeInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } else {
+      setIsInstallModalOpen(true);
+    }
+  };
+
   const handleSeeAllCategory = (mediaType: MediaType, category: MediaCategory) => {
     setExploreType(mediaType);
     setExploreCategory(category);
@@ -24,13 +51,18 @@ export const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0A0D18] text-slate-100 flex flex-col font-sans">
       {/* PWA Install Banner */}
-      <PwaInstallBanner />
+      <PwaInstallBanner
+        onOpenModal={() => setIsInstallModalOpen(true)}
+        deferredPrompt={deferredPrompt}
+        onNativeInstall={handleNativeInstall}
+      />
 
       {/* Top Header */}
       <Header
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
         onSearchFocus={() => setActiveTab('EXPLORE')}
+        onInstallClick={() => setIsInstallModalOpen(true)}
       />
 
       {/* Main View Container */}
@@ -70,6 +102,14 @@ export const AppContent: React.FC = () => {
         mediaId={selectedMediaId}
         onClose={() => setSelectedMediaId(null)}
         onSelectRecommendation={(rec) => setSelectedMediaId(rec.id)}
+      />
+
+      {/* PWA Installation Instructions Modal */}
+      <PwaInstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        onNativeInstall={handleNativeInstall}
+        hasNativePrompt={!!deferredPrompt}
       />
     </div>
   );

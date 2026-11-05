@@ -1,22 +1,26 @@
 {
+  "id": "cinepulse-pwa-v1",
   "short_name": "CinePulse",
-  "name": "CinePulse - Worldwide Entertainment Hub",
-  "description": "Discover worldwide Movies, TV Series, and Anime with real-time streaming availability and ratings.",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": "/",
+  "name": "CinePulse — Worldwide Entertainment Hub",
+  "description": "Discover 2024-2026 worldwide Movies, TV Series, and Anime with streaming availability and ratings.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0A0D18",
   "theme_color": "#0A0D18",
-  "display": "standalone",
-  "orientation": "portrait-primary"
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
 }

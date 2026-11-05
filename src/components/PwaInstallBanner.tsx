@@ -1,80 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { Download, X } from 'lucide-react';
 
-export const PwaInstallBanner: React.FC = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+interface PwaInstallBannerProps {
+  onOpenModal: () => void;
+  deferredPrompt: any;
+  onNativeInstall: () => void;
+}
+
+export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
+  onOpenModal,
+  deferredPrompt,
+  onNativeInstall
+}) => {
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check if already in standalone PWA mode
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone) {
       setIsInstalled(true);
       return;
     }
 
-    const handleBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowBanner(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-    // Also check after 3 seconds if not installed to offer gentle guidance
     const timer = setTimeout(() => {
-      if (!isInstalled && !localStorage.getItem('cinepulse_pwa_dismissed')) {
+      if (!isInstalled && !localStorage.getItem('cinepulse_pwa_banner_dismissed')) {
         setShowBanner(true);
       }
-    }, 2500);
+    }, 2000);
 
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleInstallClick = async () => {
+  const handleInstall = () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setShowBanner(false);
-      }
-      setDeferredPrompt(null);
+      onNativeInstall();
     } else {
-      alert('To install CinePulse:\n\n• On iOS (Safari): Tap the Share button below and select "Add to Home Screen".\n• On Android (Chrome): Tap the three-dot menu and select "Install app" or "Add to Home screen".');
+      onOpenModal();
     }
   };
 
   const handleDismiss = () => {
     setShowBanner(false);
-    localStorage.setItem('cinepulse_pwa_dismissed', 'true');
+    localStorage.setItem('cinepulse_pwa_banner_dismissed', 'true');
   };
 
   if (!showBanner || isInstalled) return null;
 
   return (
-    <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white px-4 py-3 border-b border-purple-500/30 flex items-center justify-between sticky top-0 z-40 shadow-lg">
+    <div className="bg-gradient-to-r from-purple-950 via-indigo-950 to-purple-900 text-white px-4 py-2.5 border-b border-purple-500/30 flex items-center justify-between sticky top-0 z-40 shadow-xl">
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center font-bold text-lg shadow-md border border-purple-400/40">
+        <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center font-bold text-base shadow-md border border-purple-400/30">
           🎬
         </div>
         <div>
-          <div className="text-sm font-bold flex items-center gap-1.5">
-            <span>Install CinePulse App</span>
-            <span className="text-[10px] bg-purple-500/40 text-purple-200 px-1.5 py-0.5 rounded font-mono">PWA</span>
+          <div className="text-xs sm:text-sm font-bold flex items-center space-x-1.5">
+            <span>Install CinePulse Web App</span>
+            <span className="text-[10px] bg-purple-500/40 text-purple-200 px-1.5 py-0.5 rounded font-mono font-bold">PWA</span>
           </div>
-          <div className="text-xs text-purple-200/80">Fast mobile experience & offline access on your phone</div>
+          <div className="text-[11px] text-purple-200/80 hidden sm:block">Mobile-first app experience & fast home screen launcher</div>
         </div>
       </div>
+
       <div className="flex items-center space-x-2">
         <button
-          onClick={handleInstallClick}
-          className="bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow-md transition-all active:scale-95"
+          onClick={handleInstall}
+          className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-md shadow-purple-900/40 active:scale-95 transition-all"
         >
           <Download className="w-3.5 h-3.5" />
-          <span>Install</span>
+          <span>Install Web App</span>
         </button>
         <button
           onClick={handleDismiss}
